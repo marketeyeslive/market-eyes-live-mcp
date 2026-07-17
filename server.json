@@ -1,9 +1,9 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.marketeyeslive/market-eyes-live",
-  "title": "Market Eyes Live - MELANY stock ratings",
-  "description": "Free MELANY stock ratings for 600+ US stocks and ETFs: tier, 0-100 score, 8 factors, risks.",
-  "version": "1.0.0",
+  "title": "Market Eyes Live - stock ratings and mortgage-rate context",
+  "description": "Free MCP: MELANY stock ratings for 600+ US stocks/ETFs plus mortgage-rate context.",
+  "version": "1.1.0",
   "websiteUrl": "https://marketeyeslive.com/what-is-market-eyes-live.html",
   "repository": {
     "url": "https://github.com/marketeyeslive/market-eyes-live-mcp",

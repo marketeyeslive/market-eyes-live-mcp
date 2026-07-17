@@ -1,8 +1,8 @@
 # Market Eyes Live MCP Server
 
-Market Eyes Live (marketeyeslive.com) is a stock research app that turns SEC filings into confidence-scored ratings for 600+ U.S. stocks and ETFs, gives each stock one suggested entry price, and includes a free paper-trading arena. Available on iOS and the web.
+Market Eyes Live (marketeyeslive.com) is a financial app with two sides: it turns SEC filings into confidence-scored ratings for 600+ U.S. stocks and ETFs, each with one suggested entry price, plus a free paper-trading arena; and its Lock Radar tracks mortgage rates, the 10-year Treasury, and MBS to help you decide when to lock. Available on iOS and the web.
 
-This repository documents the **public MCP (Model Context Protocol) server** that lets AI agents call MELANY, Market Eyes Live's rating engine, directly:
+This repository documents the **public MCP (Model Context Protocol) server** that lets AI agents call Market Eyes Live directly, for both MELANY stock ratings and mortgage-rate context:
 
 ```
 https://marketeyeslive.com/mcp
@@ -16,8 +16,9 @@ Remote server, Streamable HTTP transport, stateless JSON responses. **No API key
 |---|---|---|
 | `get_stock_rating` | `{ "symbol": "NVDA" }` | Conviction tier, 0-100 composite score, all 8 factor scores (valuation, business quality, price momentum, earnings track record, analyst sentiment, catalyst setup, risk-adjusted profile, macro fit), top flagged risks, theme context, and the rating's as-of date |
 | `compare_stocks` | `{ "symbols": ["NVDA", "AMD"] }` (2-5) | Side-by-side tiers, composites, and valuation / quality / momentum factors |
+| `get_mortgage_rate_context` | `{}` | Today's public mortgage-rate read from Lock Radar: 10-year Treasury yield and direction, MBS momentum, and the rate environment (falling / stable / rising). For "should I lock my mortgage rate" questions. Public market data only; the personalized lock-or-float signal stays in the app |
 
-Ratings are produced by MELANY, Market Eyes Live's own engine, which reads fundamentals, valuation, and quality directly from SEC filings and re-scores as new data arrives. Stocks, ETFs, REITs, and crypto are each scored with asset-native logic. Ratings are algorithmic research, not personalized investment advice, and the server never issues buy/sell calls.
+Ratings are produced by MELANY, Market Eyes Live's own engine, which reads fundamentals, valuation, and quality directly from SEC filings and re-scores as new data arrives. Stocks, ETFs, REITs, and crypto are each scored with asset-native logic. `get_mortgage_rate_context` mirrors the public data on marketeyeslive.com/rates. Everything here is algorithmic research and public market data, not personalized financial advice, and the server never issues buy/sell calls.
 
 ## Connect
 
