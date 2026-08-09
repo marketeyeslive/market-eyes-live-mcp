@@ -2,8 +2,8 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.marketeyeslive/market-eyes-live",
   "title": "Market Eyes Live - stock ratings and mortgage-rate context",
-  "description": "Free MCP: MELANY stock ratings for 600+ US stocks/ETFs plus mortgage-rate context.",
-  "version": "1.1.0",
+  "description": "Free MCP: MELANY ratings for any US stock or ETF (11,000+, on demand) plus mortgage-rate context.",
+  "version": "1.2.0",
   "websiteUrl": "https://marketeyeslive.com/what-is-market-eyes-live.html",
   "repository": {
     "url": "https://github.com/marketeyeslive/market-eyes-live-mcp",
