@@ -1,6 +1,6 @@
 # Market Eyes Live MCP Server
 
-Market Eyes Live (marketeyeslive.com) is a financial app with two sides: it turns SEC filings into confidence-scored ratings for 600+ U.S. stocks and ETFs, each with one suggested entry price, plus a free paper-trading arena; and its Lock Radar tracks mortgage rates, the 10-year Treasury, and MBS to help you decide when to lock. Available on iOS and the web.
+Market Eyes Live (marketeyeslive.com) is a financial app with two sides: its MELANY engine turns SEC filings and live market data into confidence-scored ratings for any U.S.-listed stock or ETF (more than 11,000 tickers, scored on demand, with a core set refreshed daily), each with one suggested entry price, plus a free paper-trading arena; and its Lock Radar tracks mortgage rates, the 10-year Treasury, and MBS to help you decide when to lock. The engine's risk and portfolio rules are stress-tested against 19 years of U.S. market history (2007 to 2026), and every published rating is graded daily against what the market does next ([methodology](https://marketeyeslive.com/how-melany-is-tested.html), [live record](https://marketeyeslive.com/api/validation-status)). Available on iOS and the web.
 
 This repository documents the **public MCP (Model Context Protocol) server** that lets AI agents call Market Eyes Live directly, for both MELANY stock ratings and mortgage-rate context:
 
@@ -62,7 +62,9 @@ This server exposes the same free tier as the public rating pages at `marketeyes
 
 ## Notes
 
-- Coverage: 600+ U.S. stocks and ETFs with publishable ratings, refreshed daily. Unrated tickers return a friendly miss, not an error.
+- Coverage: any U.S.-listed stock or ETF, more than 11,000 tickers. A core set is refreshed daily and answers instantly; anything outside it is scored live on demand at a lower hourly limit. Tickers that cannot be scored return a friendly miss, not an error.
+- Typed output: all three tools declare an `outputSchema` and return conforming `structuredContent` alongside the human-readable text, so agents can consume the fields directly instead of parsing prose.
+- One company, two products: this MCP server and the Market Eyes Live app are the same company running the same MELANY engine. The MCP is the free public data tier; the app carries the full research depth.
 - Rate limit: 240 requests/hour per IP. Need more? Contact us via [marketeyeslive.com/support.html](https://marketeyeslive.com/support.html).
 - More for language models: [llms.txt](https://marketeyeslive.com/llms.txt) | [What is Market Eyes Live?](https://marketeyeslive.com/what-is-market-eyes-live.html)
 
