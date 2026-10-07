@@ -20,7 +20,7 @@ A rating is a conviction tier and a 0 to 100 composite score built from eight fa
 
 All three tools are read-only (`readOnlyHint: true`), declare an `outputSchema`, and return conforming `structuredContent` alongside the text. Every result carries `source` and a `disclaimer`; stock results also carry `links.rating_page` and `links.methodology`.
 
-Coverage is **U.S.-listed stocks and ETFs only**. Crypto, futures, and non-U.S. listings (for example `SHOP.TO` or `BTC-USD`) return a "not covered" result, as do the few U.S. tickers that share a name with a futures contract or a coin (CORN, GOLD, WTI, BTC, ETH).
+Coverage is **U.S.-listed stocks and ETFs only**. Crypto, futures, and non-U.S. listings (for example `SHOP.TO` or `BTC-USD`) return a "not covered" result. Five U.S. tickers that share their symbol with a futures contract or a coin (CORN, GOLD, WTI, BTC, ETH) are not rated, and the result says so. Class shares work in either spelling (`BRK-B` or `BRK.B`). The tier is always one of: Unfavorable, Hold, Favorable, Highest Conviction, Promising, Very Promising, Rising Star, Runner!, Catalyst Watch (ETFs and REITs use the same ladder).
 
 ## Connect
 
@@ -80,8 +80,9 @@ Only tool calls count; connecting, listing tools and pings are free.
 
 - 240 tool calls per hour per user when the AI platform passes an anonymous user id (ChatGPT does), otherwise per network address.
 - 3,000 per hour shared by a platform that passes no user id (for example Claude).
+- 3,000 per hour shared by all callers that do not come through a platform.
 - 6,000 per hour across all callers.
-- Live scoring of a ticker outside the daily-refreshed set: 20 per hour per user or address, 100 per hour per platform, 300 per hour across all callers. Live scores are reused for 12 hours.
+- Live scoring of a ticker outside the daily-refreshed set: 20 per hour per user or address, 100 per hour per platform, 150 per hour for callers that do not come through a platform, 300 per hour across all callers. Live scores are reused for 12 hours.
 
 A limit hit returns an error result that names the limit and when it resets. For higher volume, email team@marketeyeslive.com. Terms: [marketeyeslive.com/api-terms](https://marketeyeslive.com/api-terms).
 
