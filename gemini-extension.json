@@ -1,0 +1,9 @@
+{
+  "name": "market-eyes-live",
+  "version": "1.4.0",
+  "mcpServers": {
+    "market-eyes-live": {
+      "httpUrl": "https://marketeyeslive.com/mcp"
+    }
+  }
+}

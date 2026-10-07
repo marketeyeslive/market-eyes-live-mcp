@@ -33,7 +33,12 @@ claude mcp add --transport http market-eyes-live https://marketeyeslive.com/mcp
 
 **ChatGPT**: Plugins, then **+**, then **Add custom MCP server**, URL `https://marketeyeslive.com/mcp`, authentication none (Plus, Pro, Business, Enterprise and Edu plans; some accounts need developer mode). Menu names may vary.
 
-**Perplexity, Gemini, Mistral Le Chat**: see the [setup steps](https://marketeyeslive.com/mcp-server).
+**Gemini CLI** (this repository is a Gemini CLI extension; `gemini-extension.json` points at the endpoint over Streamable HTTP):
+```
+gemini extensions install https://github.com/marketeyeslive/market-eyes-live-mcp
+```
+
+**Perplexity, Gemini, Grok, Mistral Le Chat**: see the [setup steps](https://marketeyeslive.com/mcp-server).
 
 Set it up on a computer; once added, it also works in the phone apps of Claude and ChatGPT.
 
