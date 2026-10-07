@@ -1,73 +1,90 @@
 # Market Eyes Live MCP Server
 
-Market Eyes Live (marketeyeslive.com) is a financial app with two sides: its MELANY engine turns SEC filings and live market data into confidence-scored ratings for any U.S.-listed stock or ETF (more than 11,000 tickers, scored on demand, with a core set refreshed daily), each with one suggested entry price, plus a free paper-trading arena; and its Lock Radar tracks mortgage rates, the 10-year Treasury, and MBS to help you decide when to lock. The engine's risk and portfolio rules are stress-tested against 19 years of U.S. market history (2007 to 2026), and every published rating is graded daily against what the market does next ([methodology](https://marketeyeslive.com/how-melany-is-tested.html), [live record](https://marketeyeslive.com/api/validation-status)). Available on iOS and the web.
-
-This repository documents the **public MCP (Model Context Protocol) server** that lets AI agents call Market Eyes Live directly, for both MELANY stock ratings and mortgage-rate context:
+A free, read-only **Model Context Protocol (MCP) server** that returns Market Eyes Live's MELANY ratings for U.S.-listed stocks and ETFs (more than 11,000 tickers), plus a daily read of U.S. mortgage-rate conditions.
 
 ```
 https://marketeyeslive.com/mcp
 ```
 
-Remote server, Streamable HTTP transport, stateless JSON responses. **No API key, no install, free.** Rate-limited per IP.
+Remote server, Streamable HTTP transport, stateless JSON responses. **No API key, no install, free.** Full documentation: [marketeyeslive.com/mcp-server](https://marketeyeslive.com/mcp-server).
+
+A rating is a conviction tier and a 0 to 100 composite score built from eight factor scores. Published ratings are recorded and graded daily against later market moves; the method and the record are public ([methodology](https://marketeyeslive.com/how-melany-is-tested.html), [raw feed](https://marketeyeslive.com/api/validation-status)).
 
 ## Tools
 
 | Tool | Input | Returns |
 |---|---|---|
-| `get_stock_rating` | `{ "symbol": "NVDA" }` | Conviction tier, 0-100 composite score, all 8 factor scores (valuation, business quality, price momentum, earnings track record, analyst sentiment, catalyst setup, risk-adjusted profile, macro fit), top flagged risks, theme context, and the rating's as-of date |
-| `compare_stocks` | `{ "symbols": ["NVDA", "AMD"] }` (2-5) | Side-by-side tiers, composites, and valuation / quality / momentum factors |
-| `get_mortgage_rate_context` | `{}` | Today's public mortgage-rate read from Lock Radar: 10-year Treasury yield and direction, MBS momentum, and the rate environment (falling / stable / rising). For "should I lock my mortgage rate" questions. Public market data only; the personalized lock-or-float signal stays in the app |
+| `get_stock_rating` | `{ "symbol": "NVDA" }` | Conviction tier (weakest to strongest: Unfavorable, Hold, Favorable, Highest Conviction; names without mature fundamentals carry Promising, Very Promising, Rising Star, Runner! or Catalyst Watch), 0 to 100 composite, the eight factor scores (valuation, quality, momentum, earnings, sentiment, catalyst, risk-adjusted, macro fit), flagged risks, theme context, as-of date |
+| `compare_stocks` | `{ "symbols": ["NVDA", "AMD"] }` (2 to 5) | Side-by-side tiers, composites, and valuation, quality and momentum scores from the daily-refreshed set |
+| `get_mortgage_rate_context` | `{}` | Today's public read: 10-year Treasury yield and direction, MBS momentum, the rate environment (falling, stable or rising), and what moves mortgage rates |
 
-Ratings are produced by MELANY, Market Eyes Live's own engine, which reads fundamentals, valuation, and quality directly from SEC filings and re-scores as new data arrives. Stocks, ETFs, REITs, and crypto are each scored with asset-native logic. `get_mortgage_rate_context` mirrors the public data on marketeyeslive.com/rates. Everything here is algorithmic research and public market data, not personalized financial advice, and the server never issues buy/sell calls.
+All three tools are read-only (`readOnlyHint: true`), declare an `outputSchema`, and return conforming `structuredContent` alongside the text. Every result carries `source` and a `disclaimer`; stock results also carry `links.rating_page` and `links.methodology`.
+
+Coverage is **U.S.-listed stocks and ETFs only**. Crypto, futures, and non-U.S. listings (for example `SHOP.TO` or `BTC-USD`) return a "not covered" result, as do the few U.S. tickers that share a name with a futures contract or a coin (CORN, GOLD, WTI, BTC, ETH).
 
 ## Connect
 
-**claude.ai / Claude Desktop** (custom connectors): add a connector with URL `https://marketeyeslive.com/mcp`.
+**Claude Code**:
+```
+claude mcp add --transport http market-eyes-live https://marketeyeslive.com/mcp
+```
+
+**claude.ai and the Claude desktop app**: Settings, then Connectors, then add a custom connector with URL `https://marketeyeslive.com/mcp` and no authentication.
+
+**ChatGPT**: Plugins, then **+**, then **Add custom MCP server**, URL `https://marketeyeslive.com/mcp`, authentication none (Plus, Pro, Business, Enterprise and Edu plans; some accounts need developer mode). Menu names may vary.
+
+**Perplexity, Gemini, Mistral Le Chat**: see the [setup steps](https://marketeyeslive.com/mcp-server).
+
+Set it up on a computer; once added, it also works in the phone apps of Claude and ChatGPT.
 
 **Cursor** (`.cursor/mcp.json`):
 ```json
 { "mcpServers": { "market-eyes-live": { "url": "https://marketeyeslive.com/mcp" } } }
 ```
 
-**Clients that only speak stdio** (via the `mcp-remote` bridge):
+**Claude Desktop config file and VS Code**:
 ```json
-{ "mcpServers": { "market-eyes-live": { "command": "npx", "args": ["-y", "mcp-remote", "https://marketeyeslive.com/mcp"] } } }
+{ "mcpServers": { "market-eyes-live": { "type": "http", "url": "https://marketeyeslive.com/mcp" } } }
 ```
 
 **Plain HTTP** (JSON-RPC 2.0):
 ```bash
 curl -s https://marketeyeslive.com/mcp \
   -H 'Content-Type: application/json' \
-  -d '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"get_stock_rating","arguments":{"symbol":"NVDA"}}}'
+  -d '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"get_stock_rating","arguments":{"symbol":"AAPL"}}}'
 ```
 
-## Example response (abridged)
+## Example `structuredContent` (illustrative values)
 
-```
-NVDA rates BUY with a MELANY composite of 71/100 as of 2026-07-17.
-
+```json
 {
-  "symbol": "NVDA",
-  "rating_tier": "BUY",
-  "composite_score": 71,
-  "factors": { "valuation": 49, "quality": 99, "momentum": 68, "earnings": 76, ... },
-  "top_risks": ["High beta 2.2, amplifies market drawdowns 1.8x+ in selloffs", ...],
-  "links": { "rating_page": "https://marketeyeslive.com/stock/NVDA" }
+  "symbol": "AAPL",
+  "rating_tier": "Highest Conviction",
+  "composite_score": 72,
+  "scale": "0-100, higher is stronger",
+  "as_of": "2026-10-06",
+  "factors": { "valuation": 41, "quality": 88, "momentum": 72, "earnings": 66, "sentiment": 58, "catalyst": 52, "risk_adjusted": 63, "macro_fit": 60 },
+  "top_risks": ["Valuation stretched vs 5-year average"],
+  "source": "Market Eyes Live",
+  "disclaimer": "Algorithmic research data, not financial advice and not personalized to anyone. Market Eyes Live does not place trades.",
+  "links": {
+    "rating_page": "https://marketeyeslive.com/stock/AAPL?utm_source=mcp&utm_medium=agent&utm_campaign=AAPL",
+    "methodology": "https://marketeyeslive.com/how-melany-is-tested.html?utm_source=mcp&utm_medium=agent&utm_campaign=methodology"
+  }
 }
 ```
 
-## What's free vs. what's in the app
+## Limits
 
-This server exposes the same free tier as the public rating pages at `marketeyeslive.com/stock/{TICKER}`. The suggested entry zone, alert levels, position sizing, and live re-scored ratings are free in the Market Eyes Live app ([iOS](https://apps.apple.com/us/app/market-eyes-live/id6778625308) / [web](https://marketeyeslive.com)); the deepest research sits behind Pro.
+Only tool calls count; connecting, listing tools and pings are free.
 
-## Notes
+- 240 tool calls per hour per user when the AI platform passes an anonymous user id (ChatGPT does), otherwise per network address.
+- 3,000 per hour shared by a platform that passes no user id (for example Claude).
+- 6,000 per hour across all callers.
+- Live scoring of a ticker outside the daily-refreshed set: 20 per hour per user or address, 100 per hour per platform, 300 per hour across all callers. Live scores are reused for 12 hours.
 
-- Coverage: any U.S.-listed stock or ETF, more than 11,000 tickers. A core set is refreshed daily and answers instantly; anything outside it is scored live on demand at a lower hourly limit. Tickers that cannot be scored return a friendly miss, not an error.
-- Typed output: all three tools declare an `outputSchema` and return conforming `structuredContent` alongside the human-readable text, so agents can consume the fields directly instead of parsing prose.
-- One company, two products: this MCP server and the Market Eyes Live app are the same company running the same MELANY engine. The MCP is the free public data tier; the app carries the full research depth.
-- Rate limit: 240 requests/hour per IP. Need more? Contact us via [marketeyeslive.com/support.html](https://marketeyeslive.com/support.html).
-- More for language models: [llms.txt](https://marketeyeslive.com/llms.txt) | [What is Market Eyes Live?](https://marketeyeslive.com/what-is-market-eyes-live.html)
+A limit hit returns an error result that names the limit and when it resets. For higher volume, email team@marketeyeslive.com. Terms: [marketeyeslive.com/api-terms](https://marketeyeslive.com/api-terms).
 
 ## Disclaimer
 
-Market Eyes Live provides data-driven research and educational tools, not personalized investment advice. Ratings are algorithmic and can change. Not a recommendation to buy or sell any security. Markets involve risk, including loss of principal.
+Market Eyes Live provides algorithmic research data and educational tools, not financial advice. Ratings can change and are not a recommendation to buy or sell any security. Markets involve risk, including loss of principal. The server is read-only and never places trades.
