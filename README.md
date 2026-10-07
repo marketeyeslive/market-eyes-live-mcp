@@ -1,6 +1,6 @@
 # Market Eyes Live MCP Server
 
-A free, read-only **Model Context Protocol (MCP) server** that returns Market Eyes Live's MELANY ratings for U.S.-listed stocks and ETFs (more than 11,000 tickers), plus a daily read of U.S. mortgage-rate conditions.
+A free, read-only **Model Context Protocol (MCP) server** that returns Market Eyes Live's MELANY ratings for U.S.-listed stocks and ETFs (more than 11,000 tickers on its coverage list), plus a daily read of U.S. mortgage-rate conditions.
 
 ```
 https://marketeyeslive.com/mcp
@@ -20,7 +20,7 @@ A rating is a conviction tier and a 0 to 100 composite score built from eight fa
 
 All three tools are read-only (`readOnlyHint: true`), declare an `outputSchema`, and return conforming `structuredContent` alongside the text. Every result carries `source` and a `disclaimer`; stock results also carry `links.rating_page` and `links.methodology`.
 
-Coverage is **U.S.-listed stocks and ETFs only**. Crypto, futures, and non-U.S. listings (for example `SHOP.TO` or `BTC-USD`) return a "not covered" result. Five U.S. tickers that share their symbol with a futures contract or a coin (CORN, GOLD, WTI, BTC, ETH) are not rated, and the result says so. Class shares work in either spelling (`BRK-B` or `BRK.B`). The tier is always one of: Unfavorable, Hold, Favorable, Highest Conviction, Promising, Very Promising, Rising Star, Runner!, Catalyst Watch (ETFs and REITs use the same ladder).
+Coverage is **U.S.-listed stocks and ETFs only**. Crypto, futures, and non-U.S. listings (for example `SHOP.TO` or `BTC-USD`) return a "not covered" result. Five U.S. tickers that share their symbol with a futures contract or a coin (CORN, GOLD, WTI, BTC, ETH) are not rated, and the result says so. Class shares work in either spelling (`BRK-B` or `BRK.B`). A ticker that is not on the coverage list returns a result saying so. The tier is always one of: Unfavorable, Hold, Favorable, Highest Conviction, Promising, Very Promising, Rising Star, Runner!, Catalyst Watch. ETFs and REITs use the same ladder, chosen by the tone of the fund's own label in the app, and a leveraged or inverse fund never reads above Hold.
 
 ## Connect
 
